@@ -10,10 +10,25 @@ export const Home = () => {
   const [password, setPassword] = useState("");
 
   // Function to handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Perform login action with email and password
-    actions.login({ email, password });
+    if (email === "" || password === "") {
+      alert("Email and password must be entered");
+    } else {
+      fetch(`${process.env.BACKEND_URL}/api/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password }),
+      })
+        .then((res) => res.json())
+        .then((resAsJson) => {
+          console.log("respons from backend", resAsJson);
+          localStorage.setItem("jwt-token", resAsJson.token);
+        })
+        .catch((err) => {
+          console.error("Something is wrong with API", err);
+        });
+    }
   };
 
   return (
@@ -42,7 +57,11 @@ export const Home = () => {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick={handleSubmit}
+        >
           Login
         </button>
       </form>
