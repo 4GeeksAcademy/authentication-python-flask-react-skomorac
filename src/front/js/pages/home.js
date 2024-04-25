@@ -1,9 +1,11 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/login.css"; // Import login-specific styles if needed
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const { actions } = useContext(Context);
+  const navigate = useNavigate();
 
   // State variables to store email and password
   const [email, setEmail] = useState("");
@@ -15,19 +17,28 @@ export const Home = () => {
     if (email === "" || password === "") {
       alert("Email and password must be entered");
     } else {
-      fetch(`${process.env.BACKEND_URL}/api/token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, password: password }),
-      })
-        .then((res) => res.json())
-        .then((resAsJson) => {
-          console.log("respons from backend", resAsJson);
-          localStorage.setItem("jwt-token", resAsJson.token);
-        })
-        .catch((err) => {
-          console.error("Something is wrong with API", err);
+      try {
+        const response = await fetch(`${process.env.BACKEND_URL}/api/token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to authenticate");
+        }
+
+        const data = await response.json();
+        console.log("response from backend", data);
+        localStorage.setItem("jwt-token", data.token);
+
+        // Get the navigate function from the useNavigate hook
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Something went wrong with the API:", error.message);
+        // Display a user-friendly error message
+        alert("Failed to log in. Please check email and password.");
+      }
     }
   };
 

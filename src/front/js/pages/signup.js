@@ -1,58 +1,58 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
-
-import { Context } from "../store/appContext";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Signup = () => {
-  const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
-  // State variables to store form data
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
 
-  // Function to handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Check if passwords match
-    if (password !== repeatPassword) {
-      alert("Passwords do not match!");
-      return;
+
+    if (email === "" || password === "") {
+      alert("Email and password must be entered");
+    } else if (password !== repeatPassword) {
+      alert("Passwords do not match");
+    } else {
+      try {
+        const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(responseData.msg); // Throw the error message from the backend
+        }
+
+        // If signup is successful, redirect to dashboard
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Error signing up:", error.message);
+
+        // Check if the error message indicates that the email already exists
+        if (error.message.includes("already exists")) {
+          alert("This email is already registered. Please use a different email.");
+          
+          // Clear input fields after the user clicks "OK" on the alert
+          setEmail("");
+          setPassword("");
+          setRepeatPassword("");
+        } else {
+          alert("Failed to sign up. Please try again later.");
+        }
+      }
     }
-    // Perform signup action with form data
-    actions.signup({ firstName, lastName, email, password });
   };
 
   return (
-    <div className="container">
-      <Link to="/">
-        <button className="btn btn-primary">Back home</button>
-      </Link>
+    <div className="container text-center mt-5">
+      <h1>Sign Up</h1>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="firstName">First Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </div>
         <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input

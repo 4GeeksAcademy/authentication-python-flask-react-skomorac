@@ -52,16 +52,22 @@ def register_user():
 
     if password is None:
         return jsonify({"msg": "Password can't be empty"}), 400
-    
+
+    # Check if user with the same email already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"msg": "User with this email already exists"}), 400
+
+    # If user doesn't exist, create a new user
     user = User(
-        email = email,
-        password = password,
-        is_active = True
+        email=email,
+        password=password,
+        is_active=True
     )
 
     db.session.add(user)
     db.session.commit()
-    
+
     return jsonify({"msg": "New User created"}), 201
 
 
