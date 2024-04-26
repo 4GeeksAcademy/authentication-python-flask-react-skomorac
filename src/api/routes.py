@@ -71,6 +71,38 @@ def register_user():
     return jsonify({"msg": "New User created"}), 201
 
 
+@api.route("/check-email", methods=["POST"])
+def check_email():
+    data = request.json
+    email = data.get("email")
+
+    # Query database to check if the email exists
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        return jsonify({"exists": True}), 200
+    else:
+        return jsonify({"exists": False}), 404
+    
+
+@api.route('/update-otp', methods=['PUT'])
+def update_otp():
+    data = request.get_json()
+    email = data.get('email')
+    otp = data.get('otp')
+
+    if not email or not otp:
+        return jsonify({'error': 'Email and OTP are required'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.otp = otp
+        db.session.commit()
+        return jsonify({'message': 'OTP updated successfully'}), 200
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
+
 # Protect a route with jwt_required, which will kick out requests without a valid JWT
 @api.route("/validate", methods=["GET"])
 @jwt_required()

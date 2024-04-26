@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
-import "../../styles/login.css"; 
+import "../../styles/login.css";
 import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
@@ -30,13 +30,18 @@ export const Home = () => {
 
         const data = await response.json();
         localStorage.setItem("jwt-token", data.token);
-        // Navigate to dasbord upon success login
+        // Navigate to dashboard upon successful login
         navigate("/dashboard");
       } catch (error) {
         console.error("Something went wrong with the API:", error.message);
         alert("Failed to log in. Please check email and password.");
       }
     }
+  };
+
+  // Function to handle forgot password
+  const handleForgotPass = () => {
+    navigate("/forgotpass");
   };
 
   return (
@@ -65,13 +70,26 @@ export const Home = () => {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          onClick={handleSubmit}
-        >
-          Login
-        </button>
+        <div className="row">
+          <div className="col">
+            <button
+              type="submit"
+              className="btn btn-primary btn-block"
+              onClick={handleSubmit}
+            >
+              Login
+            </button>
+          </div>
+          <div className="col">
+            <button
+              type="button"
+              className="btn btn-link btn-block"
+              onClick={handleForgotPass}
+            >
+              Forgot Password?
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
