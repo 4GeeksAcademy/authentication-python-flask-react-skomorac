@@ -29,14 +29,11 @@ export const Home = () => {
         }
 
         const data = await response.json();
-        console.log("response from backend", data);
         localStorage.setItem("jwt-token", data.token);
-
-        // Get the navigate function from the useNavigate hook
+        // Navigate to dasbord upon success login
         navigate("/dashboard");
       } catch (error) {
         console.error("Something went wrong with the API:", error.message);
-        // Display a user-friendly error message
         alert("Failed to log in. Please check email and password.");
       }
     }
