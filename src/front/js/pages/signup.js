@@ -29,8 +29,8 @@ export const Signup = () => {
           throw new Error(responseData.msg); // Throw the error message from the backend
         }
 
-        // If signup is successful, redirect to dashboard
-        navigate("/dashboard");
+        // If signup is successful, redirect to login page
+        navigate("/");
       } catch (error) {
         console.error("Error signing up:", error.message);
 
