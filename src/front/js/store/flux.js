@@ -14,6 +14,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           initial: "white",
         },
       ],
+      email: "",
     },
     actions: {
       // Use getActions to call a function within a fuction
@@ -46,6 +47,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 
         //reset the global store
         setStore({ demo: demo });
+      },
+      setEmail: (email) => {
+        setStore({ email: email });
       },
     },
   };

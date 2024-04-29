@@ -103,6 +103,22 @@ def update_otp():
         return jsonify({'error': 'User not found'}), 404
 
 
+@api.route("/check-email-otp", methods=["POST"])
+def check_email_otp():
+    data = request.json
+    email = data.get("email")
+    otp = data.get("otp")
+
+    if not email or not otp:
+        return jsonify({"error": "Email and OTP are required"}), 400
+
+    # Query database to check if the email and OTP exist
+    user = User.query.filter_by(email=email, otp=otp).first()
+
+    if user:
+        return jsonify({"valid": True}), 200
+    else:
+        return jsonify({"valid": False}), 404
 
 
 

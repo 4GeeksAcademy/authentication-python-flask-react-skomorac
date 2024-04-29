@@ -1,17 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { Context } from "../store/appContext";
 
-export const ResetPass = ({ email }) => {
+export const ResetPass = () => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [passwordChanged, setPasswordChanged] = useState(false);
+  const { store, actions } = useContext(Context);
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    // Here you can implement the logic for resetting the password
-    // This function will be triggered when the user submits the OTP and wants to reset the password
-    // For now, I'll just simulate a password change and set the passwordChanged state to true
-    setPasswordChanged(true);
+
+    try {
+      // Fetch email from the global store
+      const email = store.email;
+
+      // Check if OTP and email are provided
+      if (!otp || !email) {
+        alert("OTP and email are required.");
+        return;
+      }
+
+      // Call the API to check if the OTP is valid for the provided email
+      const response = await fetch(
+        `${process.env.BACKEND_URL}/api/check-email-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, otp }),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.valid) {
+          // OTP and email are valid, set the passwordChanged state to true
+          setPasswordChanged(true);
+        } else {
+          // OTP is invalid or email does not exist
+          alert("Invalid OTP or email does not exist.");
+        }
+      } else {
+        // Handle other response statuses
+        alert("Invalid OTP. Please enter valid OTP");
+      }
+    } catch (error) {
+      console.error("Error checking OTP:", error);
+      alert("An error occurred while checking OTP. Please try again later.");
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -89,3 +127,5 @@ export const ResetPass = ({ email }) => {
     </div>
   );
 };
+
+export default ResetPass;

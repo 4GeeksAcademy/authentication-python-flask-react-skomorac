@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [emailExists, setEmailExists] = useState(true); // State to track if email exists
-  const [isOTPGenerated, setIsOTPGenerated] = useState(false); // State to track if OTP is generated
+  const [emailExists, setEmailExists] = useState(true);
+  const [isOTPGenerated, setIsOTPGenerated] = useState(false);
   const navigate = useNavigate();
+  const { store, actions } = useContext(Context);
 
   const generateOTP = () => {
-    // Generate a random 4-digit OTP
     const newOTP = Math.floor(1000 + Math.random() * 9000);
     setOtp(newOTP);
-    setIsOTPGenerated(true); // Set the state to indicate OTP is generated
+    setIsOTPGenerated(true);
   };
 
   const handleOTP = async (e) => {
@@ -37,16 +38,16 @@ export const ForgotPassword = () => {
         if (exists) {
           setEmailExists(true);
           generateOTP();
+          // Store email in the store
+          actions.setEmail(email);
         } else {
           setEmailExists(false);
         }
       } else {
-        // Handle server errors
         console.error("Server error:", response.statusText);
         setEmailExists(false);
       }
     } catch (error) {
-      // Handle network errors
       console.error("Network error:", error.message);
     }
   };
@@ -66,14 +67,11 @@ export const ForgotPassword = () => {
       );
 
       if (response.ok) {
-        // OTP successfully stored in the User table
         navigate("/resetpass");
       } else {
-        // Handle server errors
         console.error("Server error:", response.statusText);
       }
     } catch (error) {
-      // Handle network errors
       console.error("Network error:", error.message);
     }
   };
@@ -129,3 +127,4 @@ export const ForgotPassword = () => {
     </div>
   );
 };
+
