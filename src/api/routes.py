@@ -103,6 +103,9 @@ def update_otp():
         return jsonify({'error': 'User not found'}), 404
 
 
+
+
+
 # Protect a route with jwt_required, which will kick out requests without a valid JWT
 @api.route("/validate", methods=["GET"])
 @jwt_required()

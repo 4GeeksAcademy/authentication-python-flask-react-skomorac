@@ -67,7 +67,7 @@ export const ForgotPassword = () => {
 
       if (response.ok) {
         // OTP successfully stored in the User table
-        // Now you can navigate the user to the password reset page or perform any other action
+        navigate("/resetpass");
       } else {
         // Handle server errors
         console.error("Server error:", response.statusText);
