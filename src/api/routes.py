@@ -121,6 +121,29 @@ def check_email_otp():
         return jsonify({"valid": False}), 404
 
 
+@api.route("/update-password", methods=["PUT"])
+def update_password():
+    data = request.json
+    email = data.get("email")
+    new_password = data.get("new_password")
+
+    if not email or not new_password:
+        return jsonify({"error": "Email and new password are required"}), 400
+
+    # Query database to find the user by email
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        # Update the user's password and remove the OTP
+        user.password = new_password
+        user.otp = None  # Remove the OTP
+        db.session.commit()
+        return jsonify({"message": "Password updated successfully"}), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+
+
 
 # Protect a route with jwt_required, which will kick out requests without a valid JWT
 @api.route("/validate", methods=["GET"])

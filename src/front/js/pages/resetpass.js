@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 
 export const ResetPass = () => {
   const [otp, setOtp] = useState("");
@@ -7,6 +8,7 @@ export const ResetPass = () => {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [passwordChanged, setPasswordChanged] = useState(false);
   const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
@@ -60,10 +62,36 @@ export const ResetPass = () => {
       return;
     }
 
-    // Here you can implement the logic for changing the password
-    // This function will be triggered when the user submits the form with new password and repeat password
-    // For now, I'll just log the new password
-    console.log("New password:", newPassword);
+    try {
+      // Fetch email from the global store
+      const email = store.email;
+
+      // Call the API to update the password
+      const response = await fetch(
+        `${process.env.BACKEND_URL}/api/update-password`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, new_password: newPassword }),
+        }
+      );
+
+      if (response.ok) {
+        // Password updated successfully
+        alert("Password updated successfully. Now you can login with new password");
+        navigate("/");
+      } else {
+        // Handle other response statuses
+        alert("Failed to update password. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      alert(
+        "An error occurred while updating password. Please try again later."
+      );
+    }
   };
 
   return (
