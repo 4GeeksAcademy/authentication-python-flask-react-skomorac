@@ -56,7 +56,6 @@ export const ResetPass = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    // Check if the new password and repeat password match
     if (newPassword !== repeatPassword) {
       alert("New password and repeat password do not match.");
       return;
